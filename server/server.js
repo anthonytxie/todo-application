@@ -6,9 +6,7 @@ const {User} = require('./models/user');
 const app = express();
 
 
-app.listen(3002,()=> {
-	console.log('Server is up and running on port 3002.')
-})
+
 
 //for resource creation
 app.use(bodyParser.json());
@@ -24,9 +22,12 @@ app.post('/todos', (req,res)=> {
 	})
 });
 
+app.listen(3002,()=> {
+	console.log('Server is up and running on port 3002.')
+})
 
 
-
+module.exports = {app};
 
 
 
