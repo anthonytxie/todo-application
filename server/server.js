@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {mongoose} = require('./db/mongoose');
@@ -38,17 +39,59 @@ app.get('/todos', (req,res)=> {
 app.get('/todos/:userid', (req,res)=> {
     let userId = req.params.userid;
     if (!ObjectID.isValid(userId)) {
-         return res.status(404).send('Id not valid')
+         return res.status(404).send('ID not valid')
         }
     toDo.findById(req.params.userid).then((doc)=> {
       if(!doc) {
         return res.status(404).send(`Unable to find User ${userId}`)
       }
-      res.send(doc);
+      res.send({todo: doc});
     }).catch((err) => {
       res.status(404);
     })
 })
+
+app.delete('/todos/:userid', (req,res) => {
+  let userID = req.params.userid;
+  if (!ObjectID.isValid(userID)) {
+      return res.status(404).send('ID not valid')
+  }
+  toDo.findByIdAndRemove(userID).then((doc) => {
+    if (!doc) {
+      return res.status(404).send(`Unable to find User ${UserID}`)
+    }
+    res.send({todo: doc})
+  }).catch((err) => {
+    res.status(404).send();
+  })
+})
+
+app.patch('/todos/:userid', (req,res) => {
+  let userID = req.params.userid
+  let body = _.pick(req.body, ['text','completed']); //takes an array of properties to pull off object
+
+  if (!ObjectID.isValid(userID)) {
+      return res.status(404).send('ID not valid')
+  };
+
+  if (_.isBoolean(body.completed) && body.completed) {
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  //new:true returns updated object, not original
+  toDo.findByIdAndUpdate(userID, {$set: body}, {new:true}).then((doc)=> {
+    if (!doc) {
+      return res.status(404).send();
+    }
+    res.send({todo: doc})
+  }).catch((e)=> {
+    res.stats(400).send();
+  })
+  });
+
 
 
 
