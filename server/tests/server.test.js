@@ -9,7 +9,9 @@ const todos = [{
   text: 'First test todo'
 }, {
   _id: new ObjectID(),
-  text: 'Second test todo'
+  text: 'Second test todo',
+  completed: true,
+  completedAt: 333
 }]
 
 const userNotFound = new ObjectID()
@@ -128,6 +130,43 @@ describe('DELETE /todos/:id', () => {
       .end(done);
   })
 
+});
+
+describe('PATCH /todos/:id', () => {
+
+  it('should update the todo', (done) => {
+    let hexID = todos[0]._id.toHexString()
+    let text = 'walking Isabelle like a dog'
+    request(app)
+      .patch(`/todos/${hexID}`)
+      .send({
+        completed: true,
+        text
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(text)
+        expect(res.body.todo.completed).toBe(true)
+      }).end(done)
+    })
+
+  it('should not have completedAt when false', (done) => {
+    let hexID = todos[1]._id.toHexString()
+    let text = 'walking Isabelle like a dog'
+    let completedStatus = false
+    request(app)
+      .patch(`/todos/${hexID}`)
+      .send({
+        completed: completedStatus,
+        text
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(text)
+        expect(res.body.todo.completed).toBe(false)
+        expect(res.body.todo.completedAt).toNotExist()
+      }).end(done)
+  });
 });
 
 
