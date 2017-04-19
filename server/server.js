@@ -5,8 +5,7 @@ const {toDo} = require('./models/todo');
 const {User} = require('./models/user');
 const app = express();
 const {ObjectID} = require('mongodb'); //destructuring
-
-
+const port = process.env.PORT || 3002;
 
 
 //for resource creation
@@ -48,8 +47,8 @@ app.get('/todos/:userid', (req,res)=> {
 
 
 
-app.listen(3002,()=> {
-	console.log('Server is up and running on port 3002.')
+app.listen(port,()=> {
+	console.log(`Server is up and running at port ${port}.`)
 })
 
 
