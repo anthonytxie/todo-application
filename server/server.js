@@ -34,15 +34,15 @@ app.get('/todos', (req,res)=> {
 app.get('/todos/:userid', (req,res)=> {
     let userId = req.params.userid;
     if (!ObjectID.isValid(userId)) {
-         return res.status(400).send('Id not valid')
+         return res.status(404).send('Id not valid')
         }
     toDo.findById(req.params.userid).then((doc)=> {
       if(!doc) {
-        return res.status(400).send(`Unable to find User ${userId}`)
+        return res.status(404).send(`Unable to find User ${userId}`)
       }
       res.send(doc);
     }).catch((err) => {
-      res.status(400);
+      res.status(404);
     })
 })
 
