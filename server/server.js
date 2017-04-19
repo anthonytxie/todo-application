@@ -11,6 +11,11 @@ const port = process.env.PORT || 3002;
 //for resource creation
 app.use(bodyParser.json());
 
+app.get('/', (req,res) => {
+  res.redirect('/todos');
+})
+
+
 app.post('/todos', (req,res)=> {
 	let newtoDo = new toDo({
 		text: req.body.text
