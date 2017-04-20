@@ -1,3 +1,5 @@
+
+require('./config/config');
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -6,7 +8,7 @@ const {toDo} = require('./models/todo');
 const {User} = require('./models/user');
 const app = express();
 const {ObjectID} = require('mongodb'); //destructuring
-const port = process.env.PORT || 3002;
+const port = process.env.PORT;
 
 
 //for resource creation
