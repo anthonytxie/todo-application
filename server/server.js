@@ -9,7 +9,7 @@ const {User} = require('./models/user');
 const app = express();
 const {ObjectID} = require('mongodb'); //destructuring
 const port = process.env.PORT;
-
+const {authenticate} = require('./middleware/authenticate');
 
 //for resource creation
 app.use(bodyParser.json());
@@ -24,15 +24,15 @@ app.post('/todos', (req,res)=> {
 		text: req.body.text
 	});
 	newtoDo.save().then((doc) => {
-		res.send(doc)
+		res.send({todo:doc})
 	}, (e) => {
 		res.status(400).send(e);
 	})
 });
 
 app.get('/todos', (req,res)=> {
-  toDo.find().then((todos) => {
-    res.send({todos})
+  toDo.find().then((doc) => {
+    res.send({todo: doc})
   }, (err) => {
     res.status(400).send(err)
   })
@@ -70,9 +70,9 @@ app.delete('/todos/:userid', (req,res) => {
 
 app.patch('/todos/:userid', (req,res) => {
   let userID = req.params.userid
+  //.pick(req.body)... picks properties to pull off object and gets the key value pairs
   let body = _.pick(req.body, ['text','completed']); //takes an array of properties to pull off object
-
-  if (!ObjectID.isValid(userID)) {
+    if (!ObjectID.isValid(userID)) {
       return res.status(404).send('ID not valid')
   };
 
@@ -95,7 +95,23 @@ app.patch('/todos/:userid', (req,res) => {
   });
 
 
+app.post('/user', (req,res)=> {
+  let body = _.pick(req.body,['email','password']);
+  let newUser = new User(body)
+  newUser.save().then(()=> {
+    return newUser.generateAuthToken();
+  }).then((token) => {
+    res.header('x-auth',token).send(newUser);
+  }, (err) => {
+    res.status(404).send(err)
+  })
+})
 
+
+
+app.get('/users/me', authenticate, (req,res)=> {
+  res.send(req.user)
+});
 
 app.listen(port,()=> {
 	console.log(`Server is up and running at port ${port}.`)
